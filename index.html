@@ -1549,7 +1549,7 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
     <div class="sprite-wrap" id="spriteWrap" onclick="heroAttack()" title="Tap to attack">
       <button class="sprite-expand-btn" onclick="event.stopPropagation();openExpandedPortrait()" title="Expand portrait">⛶</button>
       <div class="sprite-frame">
-        <img id="heroImg" src="hero.jpg" alt="Hero"/>
+        <img id="heroImg" src="assets/hero.jpg" alt="Hero"/>
         <div id="heroOverlay" class="hero-overlay"></div>
         <canvas id="glassesCanvas" width="96" height="96" style="position:absolute;top:0;left:0;width:96px;height:96px;z-index:4;pointer-events:auto;image-rendering:pixelated;display:none;cursor:grab;touch-action:none"></canvas>
         <canvas id="heroAccCanvas" width="96" height="96" style="position:absolute;top:0;left:0;width:96px;height:96px;z-index:5;pointer-events:auto;image-rendering:pixelated;cursor:default;touch-action:none"></canvas>
@@ -2010,6 +2010,13 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
         <div class="vera-view-mood" id="veraViewMood">IDLE</div>
         <div class="vera-view-comment-box" id="veraViewComment">...</div>
         <button class="btn" style="font-size:6px;margin-top:6px;background:#1a0e28;border:1px solid #d4a0c8;color:#f0b0d8" onclick="refreshVeraComment()">🌸 New Comment</button>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <button id="veraAudioBtn" class="btn" style="font-size:5px;background:#0a0c18;border:1px solid #3a4270;color:#6a74a0;flex:1" onclick="toggleVeraAudio()">🔇 VOICE OFF</button>
+          <input id="veraVolumeSlider" type="range" min="0" max="1" step="0.05" value="0.8"
+            onchange="setVeraVolume(this.value)"
+            style="flex:1;accent-color:#f0b0d8;height:4px;cursor:pointer" title="Volume"/>
+        </div>
+
       </div>
     </div>
 
@@ -2480,15 +2487,15 @@ window.addEventListener('resize',initBg);initBg();window.addEventListener('resiz
 //  COMPANION CHARACTER — VERA
 // ══════════════════════════════════
 const COMP_IMGS = {
-  embarassed: "vera_embarassed.png",
-  happy: "vera_happy.png",
-  idle: "vera_idle.png",
-  neutral: "vera_neutral.png",
-  sad: "vera_sad.png",
-  sleeping: "vera_sleeping.png",
-  surprised: "vera_surprised.png",
-  thinking: "vera_thinking.png",
-  angry: "vera_angry.png"
+  embarassed: "assets/vera_embarassed.png",
+  happy: "assets/vera_happy.png",
+  idle: "assets/vera_idle.png",
+  neutral: "assets/vera_neutral.png",
+  sad: "assets/vera_sad.png",
+  sleeping: "assets/vera_sleeping.png",
+  surprised: "assets/vera_surprised.png",
+  thinking: "assets/vera_thinking.png",
+  angry: "assets/vera_angry.png"
 };
 
 const COMP_MSGS = {
@@ -2807,9 +2814,11 @@ function stopZzz() {
 let currentMood = 'idle';
 let moodTimer = null;
 
-function pickMsg(mood) {
+function pickMsg(mood, autoPlay) {
   const msgs = COMP_MSGS[mood] || COMP_MSGS.idle;
-  return msgs[Math.floor(Math.random() * msgs.length)];
+  const idx = Math.floor(Math.random() * msgs.length);
+  if (autoPlay !== false) playMoodLine(mood, idx);
+  return msgs[idx];
 }
 
 function setCompanionMood(mood, force) {
@@ -2961,7 +2970,10 @@ function companionPortraitClick() {
     ];
     const tier = Math.min(Math.floor((portraitPokeCount - 1) / 4), angrierEachClick.length - 1);
     const msgs = angrierEachClick[tier];
-    const msg = msgs[Math.floor(Math.random() * msgs.length)];
+    const sleepIdx = Math.floor(Math.random() * msgs.length);
+    const msg = msgs[sleepIdx];
+    const tierNames = ['tier1','tier2','tier3','tier4'];
+    playSleepLine(tierNames[tier] || 'tier1', sleepIdx);
 
     if (msgEl) {
       msgEl.classList.remove('msg-change');
@@ -2988,7 +3000,9 @@ function companionPortraitClick() {
           'FIFTEEN TIMES?! SERIOUSLY?! 😠',
           `That's IT. No more naps. EVER. Thanks to YOU.`,
         ];
-        const wMsg = wakeUpMsgs[Math.floor(Math.random() * wakeUpMsgs.length)];
+        const wakeIdx = Math.floor(Math.random() * wakeUpMsgs.length);
+        playWakeLine(wakeIdx);
+        const wMsg = wakeUpMsgs[wakeIdx];
         const msgEl2 = document.getElementById('companionMsg');
         if (msgEl2) {
           msgEl2.classList.remove('msg-change');
@@ -3089,9 +3103,11 @@ function companionPortraitClick() {
     };
     const msgs = CLICK_MSGS[currentMood] || CLICK_MSGS.idle;
     if (msgEl) {
+      const clickIdx = Math.floor(Math.random() * msgs.length);
+      playClickLine(currentMood, clickIdx);
       msgEl.classList.remove('msg-change');
       void msgEl.offsetWidth;
-      msgEl.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+      msgEl.textContent = msgs[clickIdx];
       msgEl.classList.add('msg-change');
     }
 
@@ -4125,7 +4141,9 @@ function renderVeraView() {
 function refreshVeraComment() {
   const el = document.getElementById('veraViewComment');
   if (!el) return;
-  const comment = VERA_COMMENTS[Math.floor(Math.random()*VERA_COMMENTS.length)];
+  const tabIdx = Math.floor(Math.random()*VERA_COMMENTS.length);
+  const comment = VERA_COMMENTS[tabIdx];
+  playTabLine(tabIdx);
   el.style.opacity='0';
   setTimeout(()=>{el.textContent=comment;el.style.opacity='1';},200);
   el.style.transition='opacity .3s';
@@ -4723,6 +4741,164 @@ function renderAchievementsView() {
 // ── VIBRATE HELPER (works in WebView Android)
 function vibrate(pattern) {
   try { navigator.vibrate && navigator.vibrate(pattern); } catch(e) {}
+}
+
+// ══════════════════════════════════
+//  VERA AUDIO ENGINE
+// ══════════════════════════════════
+
+// Audio is opt-in — default off until user enables it
+// Files are looked up by a key like "mood_happy_0", "click_angry_2", etc.
+// If the file doesn't exist, it fails silently — text-only fallback always works.
+
+let veraAudioEnabled = false;
+let veraAudioVolume  = 0.8;
+let _currentAudio    = null;
+let _audioLineIndex  = {}; // tracks which line index was last spoken per category
+
+try {
+  const saved = localStorage.getItem('veraAudio');
+  if (saved) {
+    const p = JSON.parse(saved);
+    veraAudioEnabled = p.enabled || false;
+    veraAudioVolume  = p.volume  !== undefined ? p.volume : 0.8;
+  }
+} catch(e) {}
+
+function saveAudioPrefs() {
+  localStorage.setItem('veraAudio', JSON.stringify({
+    enabled: veraAudioEnabled, volume: veraAudioVolume
+  }));
+}
+
+// Build the filename for a given line
+// Convention: vera_{category}_{mood}_{index}.mp3
+// Examples:
+//   vera_mood_happy_0.mp3       — companion panel mood bubble, happy mood, first line
+//   vera_click_angry_2.mp3      — portrait click, angry mood, 3rd line
+//   vera_sleep_tier2_1.mp3      — sleeping poke tier2, 2nd line
+//   vera_tab_4.mp3              — Vera tab random comment, 5th line
+//   vera_chat_q3_r1.mp3         — chat question 3, response 1
+//   vera_wake_2.mp3             — wake up angry line, 3rd line
+function veraAudioKey(category, ...parts) {
+  return `vera_${category}_${parts.join('_')}`;
+}
+
+function playVeraLine(key) {
+  if (!veraAudioEnabled) {
+    console.log('[Vera Audio] BLOCKED — audio is OFF. Enable it in the Vera tab.');
+    return;
+  }
+  if (_currentAudio) {
+    _currentAudio.pause();
+    _currentAudio.currentTime = 0;
+    _currentAudio = null;
+  }
+  const filename = `audio/${key}.mp3`;
+  console.log(`[Vera Audio] Playing: ${filename}`);
+  const audio = new Audio(filename);
+  audio.volume = veraAudioVolume;
+  audio.play()
+    .then(() => console.log(`[Vera Audio] ✓ Playing ${filename}`))
+    .catch(err => console.warn(`[Vera Audio] ✗ Failed: ${filename} —`, err.message));
+  _currentAudio = audio;
+}
+
+// ── Specific play helpers called from speech points ──
+
+// Called when mood changes and panel shows a new message
+// COMP_MSGS[mood][idx] → vera_mood_{mood}_{idx}.mp3
+function playMoodLine(mood, msgIndex) {
+  playVeraLine(veraAudioKey('mood', mood, msgIndex));
+}
+
+// Called on portrait click reactions
+// CLICK_MSGS[mood][idx] → vera_click_{mood}_{idx}.mp3
+function playClickLine(mood, msgIndex) {
+  playVeraLine(veraAudioKey('click', mood, msgIndex));
+}
+
+// Called on sleeping poke
+// tier name + idx → vera_sleep_{tier}_{idx}.mp3
+function playSleepLine(tier, msgIndex) {
+  playVeraLine(veraAudioKey('sleep', tier, msgIndex));
+}
+
+// Called on wake-up angry burst
+// vera_wake_{idx}.mp3
+function playWakeLine(msgIndex) {
+  playVeraLine(veraAudioKey('wake', msgIndex));
+}
+
+// Called on Vera tab random comment
+// vera_tab_{idx}.mp3
+function playTabLine(idx) {
+  playVeraLine(veraAudioKey('tab', idx));
+}
+
+// Called from chat — question or response
+// vera_chat_q{qIdx}_r{rIdx}.mp3  OR  vera_chat_q{qIdx}.mp3 for the question itself
+function playChatLine(qIdx, rIdx) {
+  if (rIdx === undefined) {
+    playVeraLine(veraAudioKey('chat', `q${qIdx}`));
+  } else {
+    playVeraLine(veraAudioKey('chat', `q${qIdx}`, `r${rIdx}`));
+  }
+}
+
+// ── Audio Settings UI ──
+function toggleVeraAudio() {
+  veraAudioEnabled = !veraAudioEnabled;
+  saveAudioPrefs();
+  updateAudioBtn();
+  if (veraAudioEnabled) {
+    toast('🔊 Vera voice ON — add .mp3 files to enable lines!', '#f0b0d8');
+  } else {
+    toast('🔇 Vera voice OFF', '#6a74a0');
+    if (_currentAudio) { _currentAudio.pause(); _currentAudio = null; }
+  }
+}
+
+function testVeraAudio() {
+  const log = document.getElementById('audioTestLog');
+  const setLog = (msg, col) => { if(log){log.textContent=msg;log.style.color=col||'#6a74a0';} };
+
+  if (!veraAudioEnabled) {
+    setLog('⚠ Audio is OFF — tap the Voice button first!', '#f5a623');
+    return;
+  }
+  const filename = 'vera_click_idle_0.mp3';
+  setLog(`Loading: ${filename}...`, '#6a74a0');
+  const audio = new Audio(filename);
+  audio.volume = veraAudioVolume;
+  audio.addEventListener('canplaythrough', () => {
+    setLog(`✓ File found! Playing...`, '#3ec97c');
+  });
+  audio.addEventListener('error', (e) => {
+    const codes = {1:'ABORTED',2:'NETWORK',3:'DECODE',4:'NOT FOUND'};
+    const reason = codes[audio.error?.code] || 'UNKNOWN';
+    setLog(`✗ Error: ${reason} — is ${filename} in the same folder?`, '#e84040');
+  });
+  audio.play()
+    .then(() => setLog(`✓ Playing ${filename}!`, '#3ec97c'))
+    .catch(err => setLog(`✗ Play failed: ${err.message}`, '#e84040'));
+}
+
+function setVeraVolume(val) {
+  veraAudioVolume = parseFloat(val);
+  if (_currentAudio) _currentAudio.volume = veraAudioVolume;
+  saveAudioPrefs();
+}
+
+function updateAudioBtn() {
+  const btn = document.getElementById('veraAudioBtn');
+  if (btn) {
+    btn.textContent = veraAudioEnabled ? '🔊 VOICE ON' : '🔇 VOICE OFF';
+    btn.style.borderColor = veraAudioEnabled ? '#f0b0d8' : '#3a4270';
+    btn.style.color = veraAudioEnabled ? '#f0b0d8' : '#6a74a0';
+  }
+  const vol = document.getElementById('veraVolumeSlider');
+  if (vol) vol.value = veraAudioVolume;
 }
 
 // Init companion on load
@@ -5937,6 +6113,7 @@ function toast(msg,color='#3ec97c'){
 function showLvlUp(level){
   document.getElementById('lvlText').textContent=`You reached Level ${level}!`;
   document.getElementById('lvlOverlay').classList.add('show');
+  playVeraLine('vera_system_levelup');
   companionOnLevelUp();
   setTimeout(()=>{
     burst(innerWidth/2,innerHeight*.35,'#3ec97c',50);burst(innerWidth/2,innerHeight*.35,'#ffd700',35);
@@ -6758,7 +6935,7 @@ function buildChatSession() {
       mood: 'thinking',
       answers: [
         {text:'✅ Yes, I completed it!', type:'pos', vera:'happy',
-         msg:`YES!! Amazing work on "${task.name}"! So proud of you!! 🎉✨`},
+         msg:`YES!! Amazing work on the task! So proud of you!! 🎉✨`},
         {text:'💀 Nope, I failed it.', type:'neg', vera:'sad',
          msg:`Oh no... "${task.name}" failed. It happens. You'll do better! 💙`},
         {text:'⏳ I\'ll do it later.', type:'neu', vera:'thinking',
@@ -6851,6 +7028,19 @@ function showChatQuestion(idx) {
   if (answersEl) answersEl.innerHTML = '';
 
   // Type the question
+  // Play voice line for question
+  // Task questions always use fixed key; general questions use their pool index
+  setTimeout(() => {
+    if (q.type === 'task') {
+      playVeraLine('vera_chat_task_q');
+    } else {
+      // Find this question's index in CHAT_QUESTION_POOL for a stable key
+      const poolIdx = CHAT_QUESTION_POOL.indexOf(
+        CHAT_QUESTION_POOL.find(p => p.q === q.q)
+      );
+      playChatLine(poolIdx >= 0 ? poolIdx : chatSession.currentIdx);
+    }
+  }, 300);
   typeText(q.q, () => {
     // Show answer buttons after typing
     if (answersEl) {
@@ -6898,6 +7088,18 @@ function handleChatAnswer(qIdx, aIdx) {
   setChatVeraImg(veraMood);
 
   // Show Vera's response with type animation
+  // Play voice line for response
+  setTimeout(() => {
+    if (q.type === 'task') {
+      // Task responses: r0=completed, r1=failed, r2=later — fixed filenames
+      playVeraLine(`vera_chat_task_r${aIdx}`);
+    } else {
+      const poolIdx = CHAT_QUESTION_POOL.indexOf(
+        CHAT_QUESTION_POOL.find(p => p.q === q.q)
+      );
+      playChatLine(poolIdx >= 0 ? poolIdx : chatSession.currentIdx, aIdx);
+    }
+  }, 200);
   typeText(answer.msg || '...', () => {
     // Pause 1.5s then next question
     setTimeout(() => showChatQuestion(qIdx + 1), 1500);
@@ -7015,7 +7217,8 @@ function startChatSession() {
   const nameEl = document.getElementById('chatVeraName');
   if (nameEl) nameEl.textContent = (S.companionName || 'VERA').toUpperCase();
   if (!chatSession.questions.length) {
-    typeText("Hmm... you don't have any active quests, and that's all I had! Add some quests first! 📋");
+    playVeraLine('vera_system_noquests');
+    typeText("Hmm... you don't have any active quests... and that's all I had... add some first!");
     document.getElementById('chatAnswers').innerHTML = '';
     return;
   }
@@ -7072,6 +7275,7 @@ function checkOverdueTasks() {
   if (anyFailed) {
     save();
     toast('⏰ Tasks expired and auto-failed! Take that as a lesson. 💀', '#e84040');
+    playVeraLine('vera_system_expired');
     vibrate([80,40,80,40,120]);
     companionOnFail('hard');
     evaluateCompanionMood();
@@ -7122,11 +7326,13 @@ function checkDailyReset() {
     S.lastDailyReset = todayMidnight;
     if (anyFailed) {
       toast('🌅 New day! Uncompleted daily quests auto-failed.', '#f5a623');
+      playVeraLine('vera_system_dailyfail');
       companionOnFail('medium');
       renderTasks();
       renderStats();
     } else {
       toast('🌅 New day! Your daily quests are ready. 🌸', '#3ec97c');
+      playVeraLine('vera_system_dailyready');
     }
     save();
   }
@@ -7180,6 +7386,7 @@ setInterval(()=>{
 render();
 initCompanion();
 initHeroHold();
+updateAudioBtn();
 </script>
 </body>
 </html>
