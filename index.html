@@ -45,21 +45,26 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
 
 /* title row */
 .header-title-row{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px 8px;
 }
-.hicon{width:42px;height:42px;border-radius:8px;flex-shrink:0;
+.htitle{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.hicon{width:36px;height:36px;border-radius:8px;flex-shrink:0;
   background:linear-gradient(135deg,var(--accent),#4020cc);
-  display:flex;align-items:center;justify-content:center;font-size:20px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
   border:2px solid var(--accent);animation:iconPulse 2s ease-in-out infinite alternate;
   box-shadow:0 0 16px #7c6cf544;
 }
 @keyframes iconPulse{from{box-shadow:0 0 10px #7c6cf544}to{box-shadow:0 0 28px #7c6cf599,0 0 50px #7c6cf533}}
-.htitle h1{font-family:var(--px);font-size:9px;line-height:1.7}
-.htitle p{font-size:14px;color:#6a74a0;margin-top:1px}
+.htitle h1{font-family:var(--px);font-size:9px;line-height:1;margin:0}
 .header-clock{
-  margin-left:auto;text-align:right;flex-shrink:0;
+  text-align:right;flex-shrink:0;
   display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+}
+.header-clock-spacer{
+  flex-shrink:0;min-width:80px;
 }
 .clock-time{
   font-family:var(--px);font-size:11px;color:#e8eaf6;
@@ -99,6 +104,52 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
 }
 .nav-btn.on::after{left:0;right:0;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+
+/* ── PORTRAIT MINIMIZE BUTTON ── */
+.portrait-minimize-btn{
+  position:absolute;top:4px;right:4px;z-index:20;
+  width:20px;height:20px;border-radius:3px;
+  background:rgba(10,10,24,.7);border:1px solid rgba(124,108,245,.4);
+  color:rgba(255,255,255,.6);font-size:9px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;line-height:1;padding:0;
+}
+.portrait-minimize-btn:hover{
+  background:var(--accent);border-color:var(--accent);color:#fff;
+}
+.vera-minimize-btn{
+  border-color:rgba(212,160,200,.4);
+}
+.vera-minimize-btn:hover{
+  background:#d4a0c8;border-color:#d4a0c8;
+}
+
+/* collapsed states */
+.char-card.minimized .sprite-wrap,
+.char-card.minimized .cinfo{
+  display:none;
+}
+.char-card.minimized{
+  padding:6px 10px;flex-direction:row;align-items:center;gap:8px;
+  min-height:0;
+}
+.char-card-mini-label{
+  display:none;font-family:var(--px);font-size:6px;color:#6a74a0;
+}
+.char-card.minimized .char-card-mini-label{
+  display:flex;align-items:center;gap:10px;flex:1;
+}
+.companion-panel.minimized .companion-inner{display:none}
+.companion-panel.minimized canvas{display:none!important}
+.companion-panel.minimized{
+  padding:5px 10px;min-height:0;flex-direction:row;align-items:center;
+}
+.companion-panel-mini-label{
+  display:none;font-family:var(--px);font-size:6px;color:#d4a0c8;
+}
+.companion-panel.minimized .companion-panel-mini-label{
+  display:flex;align-items:center;gap:8px;flex:1;
+}
 
 /* ── CHAR CARD ── */
 .char-card{background:linear-gradient(135deg,#12162a,#1a1f35);border:2px solid var(--border);
@@ -239,22 +290,26 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
 
 /* ── ADD FORM ── */
 /* ── TASK TABS */
-.task-tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:nowrap;overflow-x:auto}
+.task-tabs{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.task-tab-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
 .task-tab{
-  font-family:var(--px);font-size:5px;padding:7px 8px;
+  font-family:var(--px);font-size:6px;padding:8px 4px;
   background:var(--panel);border:1px solid var(--border);
   color:#6a74a0;border-radius:3px;cursor:pointer;
-  transition:all .18s;white-space:nowrap;flex-shrink:0;
+  transition:all .18s;white-space:nowrap;text-align:center;
 }
 .task-tab:hover{color:#e8eaf6;border-color:var(--accent)}
 .task-tab.on{
   background:var(--accent);border-color:var(--accent);
   color:#fff;box-shadow:0 0 10px #7c6cf544;
 }
-.task-tab.tab-urgent.on{background:#e84040;border-color:#e84040;box-shadow:0 0 10px #e8404044}
-.task-tab.tab-daily.on  {background:#3ec97c;border-color:#3ec97c;box-shadow:0 0 10px #3ec97c44}
-.task-tab.tab-repeat.on {background:#f5a623;border-color:#f5a623;box-shadow:0 0 10px #f5a62344}
-.task-tab.tab-done.on   {background:#4a5080;border-color:#4a5080}
+/* per-tab accent colours when active */
+#ttab-all.on       {background:#7c6cf5;border-color:#7c6cf5}
+#ttab-daily.on     {background:#3ec97c;border-color:#3ec97c;box-shadow:0 0 10px #3ec97c44}
+#ttab-urgent.on    {background:#e84040;border-color:#e84040;box-shadow:0 0 10px #e8404044}
+#ttab-normal.on    {background:#4a9eff;border-color:#4a9eff;box-shadow:0 0 10px #4a9eff44}
+#ttab-repeatable.on{background:#f5a623;border-color:#f5a623;box-shadow:0 0 10px #f5a62344}
+#ttab-finished.on  {background:#4a5080;border-color:#4a5080}
 .task-tab-count{
   display:inline-block;background:rgba(255,255,255,.2);
   border-radius:8px;padding:0 5px;margin-left:3px;font-size:5px;
@@ -1517,15 +1572,15 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
 <div class="app" id="app">
   <div class="header">
     <div class="header-title-row">
-      <div class="hicon">⚔</div>
-      <div class="htitle">
-        <h1>RPG TASKS</h1>
-        <p>Progress your life — one quest at a time</p>
-      </div>
       <div class="header-clock">
         <div class="clock-time" id="clockTime">00:00</div>
         <div class="clock-date" id="clockDate">...</div>
       </div>
+      <div class="htitle">
+        <div class="hicon">⚔</div>
+        <h1>RPG TASKS</h1>
+      </div>
+      <div class="header-clock-spacer"></div>
     </div>
     <div class="hnav">
       <div class="nav-row">
@@ -1545,7 +1600,8 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
     </div>
   </div>
 
-  <div class="char-card">
+  <div class="char-card" id="charCard">
+    <button class="portrait-minimize-btn" id="heroMinBtn" onclick="toggleHeroPortrait()" title="Hide portrait">▲</button>
     <div class="sprite-wrap" id="spriteWrap" onclick="heroAttack()" title="Tap to attack">
       <button class="sprite-expand-btn" onclick="event.stopPropagation();openExpandedPortrait()" title="Expand portrait">⛶</button>
       <div class="sprite-frame">
@@ -1557,6 +1613,14 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
       </div>
       <div class="sprite-glow"></div>
       <div class="sprite-hp-bar"><div class="sprite-hp-fill" id="spriteHp" style="width:100%"></div></div>
+    </div>
+    <!-- mini bar shown when collapsed -->
+    <div class="char-card-mini-label">
+      <span>⚔</span>
+      <span id="heroMiniName">HERO</span>
+      <span id="heroMiniHp" style="color:#e84040">HP ??</span>
+      <span id="heroMiniXp" style="color:#4a9eff">XP ??</span>
+      <span id="heroMiniGold" style="color:#ffd700">?? G</span>
     </div>
     <div class="cinfo">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0">
@@ -1580,6 +1644,7 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
 
   <!-- COMPANION CHARACTER -->
   <div class="companion-panel" id="companionPanel">
+    <button class="portrait-minimize-btn vera-minimize-btn" id="veraMinBtn" onclick="toggleVeraPortrait()" title="Hide Vera">▲</button>
     <!-- decorative bottom petal strip -->
     <div style="position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 8px 8px;background:linear-gradient(90deg,transparent,rgba(212,160,200,.4),rgba(212,160,200,.6),rgba(212,160,200,.4),transparent);pointer-events:none;z-index:1"></div>
     <canvas id="zzzCanvas"></canvas>
@@ -1593,6 +1658,12 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
         </div>
       </div>
 
+      <!-- mini bar shown when Vera is collapsed -->
+      <div class="companion-panel-mini-label">
+        <span>🌸</span>
+        <span id="veraMiniName">VERA</span>
+        <span id="veraMiniMood" style="color:#d4a0c8;font-size:11px">idle</span>
+      </div>
       <!-- RIGHT: name + dialogue stacked -->
       <div class="companion-dialogue-side">
         <div class="companion-name" id="companionName">VERA</div>
@@ -1682,12 +1753,16 @@ body{background:var(--bg);color:#e8eaf6;font-family:var(--vt);font-size:18px;min
 
     <!-- TASK TABS -->
     <div class="task-tabs">
-      <button class="task-tab on" id="ttab-daily"    onclick="setTaskTab('daily',this)">☀ Daily</button>
-      <button class="task-tab"    id="ttab-urgent"   onclick="setTaskTab('urgent',this)">🔥 Urgent</button>
-      <button class="task-tab"    id="ttab-normal"   onclick="setTaskTab('normal',this)">📋 Normal</button>
-      <button class="task-tab"    id="ttab-repeatable" onclick="setTaskTab('repeatable',this)">🔁 Repeat</button>
-      <button class="task-tab"    id="ttab-finished" onclick="setTaskTab('finished',this)">✅ Done</button>
-      <button class="task-tab"    id="ttab-all"      onclick="setTaskTab('all',this)">📜 All</button>
+      <div class="task-tab-row">
+        <button class="task-tab"    id="ttab-all"        onclick="setTaskTab('all',this)">📜 All</button>
+        <button class="task-tab on" id="ttab-daily"      onclick="setTaskTab('daily',this)">☀ Daily</button>
+        <button class="task-tab"    id="ttab-urgent"     onclick="setTaskTab('urgent',this)">🔥 Urgent</button>
+      </div>
+      <div class="task-tab-row">
+        <button class="task-tab"    id="ttab-normal"     onclick="setTaskTab('normal',this)">📋 Normal</button>
+        <button class="task-tab"    id="ttab-repeatable" onclick="setTaskTab('repeatable',this)">🔁 Repeat</button>
+        <button class="task-tab"    id="ttab-finished"   onclick="setTaskTab('finished',this)">✅ Done</button>
+      </div>
     </div>
 
     <div class="tasks" id="tasksList"></div>
@@ -2507,7 +2582,7 @@ const COMP_MSGS = {
     "Quest complete! You're unstoppable!"
   ],
   surprised: [
-    "LEVEL UP?! No way!! 🌟",
+    "",  // slot 0 removed — vera_mood_surprised_0 unused
     "Oh wow — you actually did it!!",
     "W-wait, already?! You're incredible!",
     "I can't believe how fast you're growing!",
@@ -2557,7 +2632,7 @@ const COMP_MSGS = {
   ],
   idle: [
     "Ready to quest? Let's go! 💪",
-    "All tasks reset. Fresh start!",
+    "I'll be here cheering you on, always.",
     "A new day, a new chance to level up!",
     "Your quests await, hero.",
     "What adventure shall we tackle today?"
@@ -2814,11 +2889,52 @@ function stopZzz() {
 let currentMood = 'idle';
 let moodTimer = null;
 
-function pickMsg(mood, autoPlay) {
+function pickMsg(mood, autoPlay, priority) {
   const msgs = COMP_MSGS[mood] || COMP_MSGS.idle;
-  const idx = Math.floor(Math.random() * msgs.length);
-  if (autoPlay !== false) playMoodLine(mood, idx);
+  // Skip empty slots (removed lines) — try up to 10 times then fall back
+  let idx, attempts = 0;
+  do { idx = Math.floor(Math.random() * msgs.length); attempts++; }
+  while (msgs[idx] === '' && attempts < 10);
+  if (msgs[idx] === '') return msgs.find(m => m !== '') || '';
+  if (autoPlay !== false) {
+    const p = priority !== undefined ? priority : 0;
+    playVeraLine(veraAudioKey('mood', mood, idx), p);
+  }
   return msgs[idx];
+}
+
+// Like setCompanionMood but plays the audio at a specific priority
+// Used for task win/fail reactions so they can interrupt each other (P2)
+// but won't interrupt chat or system lines (P4/P5)
+function setCompanionMoodWithPriority(mood, priority) {
+  currentMood = mood;
+  const img    = document.getElementById('companionImg');
+  const msgEl  = document.getElementById('companionMsg');
+  const labelEl= document.getElementById('moodLabel');
+  const panel  = document.getElementById('companionPanel');
+  if (!img || !msgEl) return;
+  panel.className = panel.className.replace(/mood-\w+/g, '').trim();
+  panel.classList.add('mood-' + mood);
+  img.classList.remove('fade-in');
+  img.classList.add('fade-out');
+  setTimeout(() => {
+    img.src = COMP_IMGS[mood] || COMP_IMGS.idle;
+    img.classList.remove('fade-out');
+    img.classList.add('fade-in');
+  }, 200);
+  msgEl.classList.remove('msg-change');
+  void msgEl.offsetWidth;
+  msgEl.textContent = pickMsg(mood, true, priority);
+  msgEl.classList.add('msg-change');
+  if (labelEl) labelEl.textContent = mood.toUpperCase();
+  const MOOD_ANIM = {
+    sleeping:'sleeping-bob', happy:'happy-bounce', angry:'angry-shake',
+    sad:'sad-sway', surprised:'surprised-pop', thinking:'thinking-lean',
+    neutral:'neutral-breathe', idle:'idle-float', embarassed:'embarassed-tremble'
+  };
+  const ALL_ANIMS = Object.values(MOOD_ANIM);
+  img.classList.remove(...ALL_ANIMS);
+  if (MOOD_ANIM[mood]) img.classList.add(MOOD_ANIM[mood]);
 }
 
 function setCompanionMood(mood, force) {
@@ -2918,15 +3034,15 @@ function evaluateCompanionMood() {
 
 // Triggered on task complete
 function companionOnWin(diff) {
-  if (diff === 'epic') setCompanionMood('happy', true);
-  else setCompanionMood('happy', true);
+  const mood = diff === 'epic' ? 'surprised' : 'happy';
+  setCompanionMoodWithPriority(mood, 2);
   evaluateCompanionMoodDelayed();
 }
 
 // Triggered on task fail
 function companionOnFail(diff) {
-  if (diff === 'hard' || diff === 'epic') setCompanionMood('angry', true);
-  else setCompanionMood('sad', true);
+  const mood = (diff === 'hard' || diff === 'epic') ? 'angry' : 'sad';
+  setCompanionMoodWithPriority(mood, 2);
   evaluateCompanionMoodDelayed();
 }
 
@@ -4744,6 +4860,68 @@ function vibrate(pattern) {
 }
 
 // ══════════════════════════════════
+//  PORTRAIT MINIMIZE / RESTORE
+// ══════════════════════════════════
+let heroMinimized = false;
+let veraMinimized = false;
+try {
+  const ms = JSON.parse(localStorage.getItem('portraitMin')||'{}');
+  heroMinimized = !!ms.hero;
+  veraMinimized = !!ms.vera;
+} catch(e){}
+
+function saveMinState() {
+  localStorage.setItem('portraitMin', JSON.stringify({hero:heroMinimized, vera:veraMinimized}));
+}
+
+function toggleHeroPortrait() {
+  heroMinimized = !heroMinimized;
+  applyHeroMinimize();
+  saveMinState();
+}
+
+function toggleVeraPortrait() {
+  veraMinimized = !veraMinimized;
+  applyVeraMinimize();
+  saveMinState();
+}
+
+function applyHeroMinimize() {
+  const card = document.getElementById('charCard');
+  const btn  = document.getElementById('heroMinBtn');
+  if (!card) return;
+  card.classList.toggle('minimized', heroMinimized);
+  if (btn) btn.textContent = heroMinimized ? '▼' : '▲';
+  // Update mini labels
+  if (heroMinimized) {
+    const el = n => document.getElementById(n);
+    if(el('heroMiniName'))  el('heroMiniName').textContent  = S.name || 'HERO';
+    if(el('heroMiniHp'))    el('heroMiniHp').textContent    = `HP ${S.hp}/${S.maxHp}`;
+    if(el('heroMiniXp'))    el('heroMiniXp').textContent    = `XP ${S.xp}`;
+    if(el('heroMiniGold'))  el('heroMiniGold').textContent  = `${S.gold} G`;
+  }
+}
+
+function applyVeraMinimize() {
+  const panel = document.getElementById('companionPanel');
+  const btn   = document.getElementById('veraMinBtn');
+  if (!panel) return;
+  panel.classList.toggle('minimized', veraMinimized);
+  if (btn) btn.textContent = veraMinimized ? '▼' : '▲';
+  if (veraMinimized) {
+    const mn = document.getElementById('veraMiniName');
+    const mm = document.getElementById('veraMiniMood');
+    if(mn) mn.textContent = S.companionName || 'VERA';
+    if(mm) mm.textContent = typeof currentMood !== 'undefined' ? currentMood : 'idle';
+  }
+}
+
+function initPortraitMinimize() {
+  applyHeroMinimize();
+  applyVeraMinimize();
+}
+
+// ══════════════════════════════════
 //  VERA AUDIO ENGINE
 // ══════════════════════════════════
 
@@ -4784,65 +4962,80 @@ function veraAudioKey(category, ...parts) {
   return `vera_${category}_${parts.join('_')}`;
 }
 
-function playVeraLine(key) {
-  if (!veraAudioEnabled) {
-    console.log('[Vera Audio] BLOCKED — audio is OFF. Enable it in the Vera tab.');
-    return;
-  }
-  if (_currentAudio) {
+// Priority levels — higher number = more important, always interrupts lower
+// 0: mood bubble (ambient, lowest — never interrupts anything)
+// 1: tab comment
+// 2: sleep poke / wake up
+// 3: click reaction
+// 4: chat question / response
+// 5: system messages (level up, expired, daily reset — highest)
+let _currentAudioPriority = 0;
+
+function playVeraLine(key, priority) {
+  if (!veraAudioEnabled) return;
+  const p = priority !== undefined ? priority : 3;
+
+  // Don't interrupt a higher-priority line still playing
+  if (_currentAudio && !_currentAudio.ended && !_currentAudio.paused) {
+    if (p < _currentAudioPriority) return; // current is more important, skip
+    if (p <= 1 && p === _currentAudioPriority) return; // same low-priority ambient, skip
+    // New line wins — interrupt
     _currentAudio.pause();
     _currentAudio.currentTime = 0;
-    _currentAudio = null;
   }
+  _currentAudio = null;
+  _currentAudioPriority = p;
+
   const filename = `audio/${key}.mp3`;
-  console.log(`[Vera Audio] Playing: ${filename}`);
   const audio = new Audio(filename);
   audio.volume = veraAudioVolume;
-  audio.play()
-    .then(() => console.log(`[Vera Audio] ✓ Playing ${filename}`))
-    .catch(err => console.warn(`[Vera Audio] ✗ Failed: ${filename} —`, err.message));
+  audio.addEventListener('ended', () => {
+    if (_currentAudio === audio) { _currentAudio = null; _currentAudioPriority = 0; }
+  });
+  audio.play().catch(() => {
+    if (_currentAudio === audio) { _currentAudio = null; _currentAudioPriority = 0; }
+  });
   _currentAudio = audio;
 }
 
 // ── Specific play helpers called from speech points ──
 
-// Called when mood changes and panel shows a new message
-// COMP_MSGS[mood][idx] → vera_mood_{mood}_{idx}.mp3
+// Priority 0 — ambient mood bubble, never interrupts anything else
 function playMoodLine(mood, msgIndex) {
-  playVeraLine(veraAudioKey('mood', mood, msgIndex));
+  playVeraLine(veraAudioKey('mood', mood, msgIndex), 0);
 }
 
 // Called on portrait click reactions
 // CLICK_MSGS[mood][idx] → vera_click_{mood}_{idx}.mp3
 function playClickLine(mood, msgIndex) {
-  playVeraLine(veraAudioKey('click', mood, msgIndex));
+  playVeraLine(veraAudioKey('click', mood, msgIndex), 3); // priority 3
 }
 
 // Called on sleeping poke
 // tier name + idx → vera_sleep_{tier}_{idx}.mp3
 function playSleepLine(tier, msgIndex) {
-  playVeraLine(veraAudioKey('sleep', tier, msgIndex));
+  playVeraLine(veraAudioKey('sleep', tier, msgIndex), 2); // priority 2
 }
 
 // Called on wake-up angry burst
 // vera_wake_{idx}.mp3
 function playWakeLine(msgIndex) {
-  playVeraLine(veraAudioKey('wake', msgIndex));
+  playVeraLine(veraAudioKey('wake', msgIndex), 2); // priority 2
 }
 
 // Called on Vera tab random comment
 // vera_tab_{idx}.mp3
 function playTabLine(idx) {
-  playVeraLine(veraAudioKey('tab', idx));
+  playVeraLine(veraAudioKey('tab', idx), 1); // priority 1
 }
 
 // Called from chat — question or response
 // vera_chat_q{qIdx}_r{rIdx}.mp3  OR  vera_chat_q{qIdx}.mp3 for the question itself
 function playChatLine(qIdx, rIdx) {
   if (rIdx === undefined) {
-    playVeraLine(veraAudioKey('chat', `q${qIdx}`));
+    playVeraLine(veraAudioKey('chat', `q${qIdx}`), 4); // priority 4
   } else {
-    playVeraLine(veraAudioKey('chat', `q${qIdx}`, `r${rIdx}`));
+    playVeraLine(veraAudioKey('chat', `q${qIdx}`, `r${rIdx}`), 4);
   }
 }
 
@@ -5066,7 +5259,7 @@ function defS(){return{
   name:'HERO',level:1,xp:0,hp:100,maxHp:100,gold:0,lucky:false,
   companionName:'VERA',
   stats:{str:5,dex:5,con:5,int:5,wis:5,cha:5},
-  tasks:[], taskTab:'daily', lastDailyReset:0,
+  tasks:[], taskTab:'all', lastDailyReset:0,
   log:[],nextId:1,
   battleTokens:0,
   inventory:{potions:0,bombs:0,shields:0},
@@ -5118,7 +5311,7 @@ if(S.deathCount===undefined)S.deathCount=0;
 if(!S.glassesOffset)S.glassesOffset={x:0,y:0};
 if(!S.accessoryOffsets)S.accessoryOffsets={crown:{x:0,y:0},earring:{x:0,y:0},halo:{x:0,y:0},cape:{x:0,y:0}};
 // migrate old tasks
-if(!S.taskTab)S.taskTab='daily';
+if(!S.taskTab)S.taskTab='all';
 if(!S.lastDailyReset)S.lastDailyReset=0;
 if(S.tasks)S.tasks.forEach(t=>{
   if(typeof t.done==='boolean'){t.state=t.done?'win':'active';delete t.done;}
@@ -5245,7 +5438,8 @@ const SHOP=[
       S=defS();
       S.deathCount=keepDeaths;
       save(); render();
-      toast('Fresh start! All progress reset. Deaths remembered. 💀','#ff90ce');
+      playVeraLine('vera_system_reset', 5);
+  toast('Fresh start! All progress reset. Deaths remembered. 💀','#ff90ce');
       evaluateCompanionMood();
     }},
   {tab:'misc',icon:'🔓',name:'Battle Unlock',desc:'Unlock Elite & Boss battles at any level',cost:200,
@@ -5778,6 +5972,7 @@ function hardReset(){
   save();
   document.getElementById('gameOver').classList.remove('show');
   render();
+  playVeraLine('vera_system_reset', 5);
   toast('Everything reset. Fresh start! 💀','#ff6060');
 }
 
@@ -5807,6 +6002,7 @@ function hardResetKeepTasks(){
   save();
   document.getElementById('gameOver').classList.remove('show');
   render();
+  playVeraLine('vera_system_reset', 5);
   toast('Progress reset. Tasks kept! Expired tasks moved to finished. ✅','#3ec97c');
 }
 function buyItem(i){
@@ -5864,6 +6060,8 @@ function render(){
   updateGlassesOverlay();
   updateHeroAccessories();
   updateVeraAccessories();
+  applyHeroMinimize();
+  applyVeraMinimize();
   renderTasks();renderStats();renderShop();
 }
 
@@ -6113,8 +6311,10 @@ function toast(msg,color='#3ec97c'){
 function showLvlUp(level){
   document.getElementById('lvlText').textContent=`You reached Level ${level}!`;
   document.getElementById('lvlOverlay').classList.add('show');
-  playVeraLine('vera_system_levelup');
-  companionOnLevelUp();
+  // Play levelup audio first — delay companionOnLevelUp so its mood change
+  // doesn't race and overwrite the audio slot before it loads
+  playVeraLine(Math.random() < 0.5 ? 'vera_system_levelup' : 'vera_system_levelup1', 5);
+  setTimeout(()=>companionOnLevelUp(), 200);
   setTimeout(()=>{
     burst(innerWidth/2,innerHeight*.35,'#3ec97c',50);burst(innerWidth/2,innerHeight*.35,'#ffd700',35);
     burst(innerWidth*.3,innerHeight*.35,'#7c6cf5',20);burst(innerWidth*.7,innerHeight*.35,'#ff6bce',20);
@@ -7032,7 +7232,7 @@ function showChatQuestion(idx) {
   // Task questions always use fixed key; general questions use their pool index
   setTimeout(() => {
     if (q.type === 'task') {
-      playVeraLine('vera_chat_task_q');
+      playVeraLine('vera_chat_task_q', 5);
     } else {
       // Find this question's index in CHAT_QUESTION_POOL for a stable key
       const poolIdx = CHAT_QUESTION_POOL.indexOf(
@@ -7217,7 +7417,7 @@ function startChatSession() {
   const nameEl = document.getElementById('chatVeraName');
   if (nameEl) nameEl.textContent = (S.companionName || 'VERA').toUpperCase();
   if (!chatSession.questions.length) {
-    playVeraLine('vera_system_noquests');
+    playVeraLine('vera_system_noquests', 5);
     typeText("Hmm... you don't have any active quests... and that's all I had... add some first!");
     document.getElementById('chatAnswers').innerHTML = '';
     return;
@@ -7275,7 +7475,7 @@ function checkOverdueTasks() {
   if (anyFailed) {
     save();
     toast('⏰ Tasks expired and auto-failed! Take that as a lesson. 💀', '#e84040');
-    playVeraLine('vera_system_expired');
+    playVeraLine('vera_system_expired', 5);
     vibrate([80,40,80,40,120]);
     companionOnFail('hard');
     evaluateCompanionMood();
@@ -7326,13 +7526,13 @@ function checkDailyReset() {
     S.lastDailyReset = todayMidnight;
     if (anyFailed) {
       toast('🌅 New day! Uncompleted daily quests auto-failed.', '#f5a623');
-      playVeraLine('vera_system_dailyfail');
+      playVeraLine('vera_system_dailyfail', 5);
       companionOnFail('medium');
       renderTasks();
       renderStats();
     } else {
       toast('🌅 New day! Your daily quests are ready. 🌸', '#3ec97c');
-      playVeraLine('vera_system_dailyready');
+      playVeraLine('vera_system_dailyready', 5);
     }
     save();
   }
@@ -7387,6 +7587,7 @@ render();
 initCompanion();
 initHeroHold();
 updateAudioBtn();
+initPortraitMinimize();
 </script>
 </body>
 </html>
